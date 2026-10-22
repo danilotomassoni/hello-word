@@ -145,6 +145,12 @@ cd scripts/carga
 docker compose up --abort-on-container-exit
 ```
 
+Para remover containers órfãos e reiniciar os serviços com a configuração atual:
+
+```bash
+docker compose down --remove-orphans && docker compose up
+```
+
 O Compose está configurado com `network_mode: host`, para que o container k6
 acesse o Nginx pelo `localhost` da máquina. Esse modo é voltado a Linux e
 compartilha a rede do host. O teste não inicia a aplicação nem o Nginx; eles

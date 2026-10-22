@@ -1,9 +1,16 @@
 spring:
   application:
     name: hello-word
-
+  threads:
+    virtual:
+      enabled: true
+    
 logging:
   pattern:
     console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){%level} %clr(%msg%n){%level}"
 server:
   port: 8080
+  tomcat:
+    threads:
+      max: 40
+      min-spare: 10
