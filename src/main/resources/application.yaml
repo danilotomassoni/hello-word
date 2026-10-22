@@ -1,3 +1,9 @@
 spring:
   application:
     name: hello-word
+
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%level){%level} %clr(%msg%n){%level}"
+server:
+  port: 8080
