@@ -131,9 +131,11 @@ mostrar o endereço do proxy em vez do IP original do cliente.
 ## Teste de carga
 
 O script `scripts/carga/teste-carga.js` usa k6 para chamar
-`http://localhost/api/v1/hello` pelo Nginx. Ele aumenta a carga até 100 usuários
-virtuais e verifica que menos de 1% das requisições falham e que o percentil 95
-do tempo de resposta fica abaixo de 150 ms.
+`http://localhost/api/v1/hello` pelo Nginx. O cenário sobe gradualmente até 100
+usuários virtuais, mantém essa carga por 30 segundos e então reduz a carga. Cada
+requisição verifica o status `200` e o corpo exato `Hello World!`. O teste falha
+se algum check não passar, se 1% ou mais das requisições falharem ou se o
+percentil 95 do tempo de resposta atingir 150 ms.
 
 Com a aplicação e o Nginx em execução, rode o teste a partir do diretório do
 script:
@@ -147,3 +149,11 @@ O Compose está configurado com `network_mode: host`, para que o container k6
 acesse o Nginx pelo `localhost` da máquina. Esse modo é voltado a Linux e
 compartilha a rede do host. O teste não inicia a aplicação nem o Nginx; eles
 precisam estar disponíveis antes de executá-lo.
+
+Para testar outra URL, informe `TARGET_URL` ao Compose:
+
+```bash
+TARGET_URL=http://localhost:8080/api/v1/hello docker compose up --abort-on-container-exit
+```
+
+Esse exemplo acessa a aplicação diretamente, sem passar pelo Nginx.

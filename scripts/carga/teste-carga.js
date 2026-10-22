@@ -2,30 +2,39 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 export const options = {
-    stages: [
-        { duration: '10s', target: 30 },  
-        { duration: '20s', target: 100 }, 
-        { duration: '10s', target: 0 },   
-    ],
+    scenarios: {
+        hello_world: {
+            executor: 'ramping-vus',
+            startVUs: 0,
+            stages: [
+                { duration: '10s', target: 30 },
+                { duration: '20s', target: 100 },
+                { duration: '30s', target: 100 },
+                { duration: '10s', target: 0 },
+            ],
+            gracefulRampDown: '10s',
+        },
+    },
     thresholds: {
-        http_req_failed: ['rate<0.01'],   
-        http_req_duration: ['p(95)<150'], 
+        checks: ['rate==1'],
+        http_req_failed: ['rate<0.01'],
+        http_req_duration: ['p(95)<40'],
     },
 };
 
-// Como usamos network_mode host, o localhost aponta diretamente para o seu NGINX local
-const TARGET_URL = 'http://localhost/api/v1/hello';
+const TARGET_URL = __ENV.TARGET_URL || 'http://localhost/api/v1/hello';
 
 export default function () {
-    const res = http.get(TARGET_URL);
-
-    const statusOk = res.status === 200;
-    const bodyOk = res && res.body && res.body.includes('Hello World');
-
-    check(res, {
-        'status é 200 OK': () => statusOk,
-        'conteúdo contém Hello World': () => bodyOk,
+    const res = http.get(TARGET_URL, {
+        headers: { Accept: 'text/plain' },
+        tags: { endpoint: 'hello' },
+        timeout: '5s',
     });
 
-    sleep(Math.random() * 0.02 + 0.01);
+    check(res, {
+        'status é 200 OK': (response) => response.status === 200,
+        'resposta contém o texto esperado': (response) => response.body === 'Hello World!',
+    });
+
+    sleep(0.01);
 }

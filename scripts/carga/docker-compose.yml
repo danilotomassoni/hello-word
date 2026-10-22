@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   k6:
     image: grafana/k6:latest
     volumes:
       - ./:/scripts
     command: run /scripts/teste-carga.js
+    environment:
+      TARGET_URL: ${TARGET_URL:-http://localhost/api/v1/hello}
     # Faz o container compartilhar a mesma rede da sua máquina Linux (localhost funciona direto)
     network_mode: "host"
