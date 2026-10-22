@@ -1,5 +1,9 @@
 # Hello Word
 
+[![Java 25](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot 4.1.2](https://img.shields.io/badge/Spring_Boot-4.1.2-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Maven](https://img.shields.io/badge/Maven-wrapper-C71A36?logo=apachemaven&logoColor=white)](https://maven.apache.org/wrapper/)
+
 API HTTP simples em Spring Boot, usada para responder a uma requisição de
 saudação e exercitar o encaminhamento e o balanceamento de tráfego com Nginx.
 
@@ -60,6 +64,16 @@ O Nginx recebe as conexões HTTP na porta `80` e encaminha as requisições do
 endpoint para a aplicação. O exemplo abaixo configura duas instâncias locais
 do serviço, nas portas `8080` e `8081`; o balanceamento padrão do Nginx entre
 servidores de um `upstream` é round-robin.
+
+```mermaid
+flowchart LR
+    C[Cliente / k6] -->|GET /api/v1/hello| N[Nginx<br/>Proxy reverso :80]
+    N -->|Round-robin| U1[API Spring Boot<br/>:8080]
+    N -->|Round-robin| U2[API Spring Boot<br/>:8081]
+    U1 -->|200 Hello World!| N
+    U2 -->|200 Hello World!| N
+    N -->|Resposta HTTP| C
+```
 
 Crie, por exemplo, `/etc/nginx/conf.d/hello-word.conf`:
 
