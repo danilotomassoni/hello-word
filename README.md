@@ -58,6 +58,68 @@ Depois de empacotar, o JAR pode ser executado assim:
 java -jar target/hello-word-0.0.2-SNAPSHOT.jar
 ```
 
+## Executar com Docker
+
+Construa a imagem a partir da raiz do projeto:
+
+```bash
+docker build -f dockerfile -t hello-word .
+```
+
+Inicie o container:
+
+```bash
+docker run --rm -p 8080:8080 hello-word
+```
+
+Em outro terminal, teste o endpoint:
+
+```bash
+curl http://localhost:8080/api/v1/hello
+```
+
+A resposta esperada é `Hello World!`. Para parar o container, pressione
+`Ctrl+C` no terminal em que ele está rodando.
+
+### Executar cinco instâncias com Docker Compose
+
+O arquivo `docker-compose.yml` inicia cinco instâncias da API. Cada uma escuta
+na porta `8080` dentro do container e fica disponível no host pelas portas
+`8080` a `8084`:
+
+```bash
+docker compose up --build
+```
+
+Para iniciar em segundo plano, use:
+
+```bash
+docker compose up --build -d
+```
+
+Confira o estado das instâncias e acompanhe os logs de um serviço específico:
+
+```bash
+docker compose ps
+docker compose logs -f app-8080
+```
+
+Para ver os logs de outra instância, substitua `app-8080` por `app-8081`,
+`app-8082`, `app-8083` ou `app-8084`.
+
+Teste qualquer instância, por exemplo:
+
+```bash
+curl http://localhost:8080/api/v1/hello
+curl http://localhost:8084/api/v1/hello
+```
+
+Para parar e remover os containers:
+
+```bash
+docker compose down
+```
+
 ## Proxy reverso com Nginx
 
 O Nginx recebe as conexões HTTP na porta `80` e encaminha as requisições do
