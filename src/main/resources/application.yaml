@@ -1,6 +1,9 @@
 spring:
   application:
     name: hello-word
+  profiles:
+    active:
+    - prod
   threads:
     virtual:
       enabled: true
