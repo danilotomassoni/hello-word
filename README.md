@@ -22,10 +22,17 @@ alterada para executar mais de uma instância.
 ## Requisitos
 
 - Java 25
+- Redis 7 ou superior para executar a aplicação localmente
 - Nginx para o exemplo de proxy reverso
 - Docker e Docker Compose, caso queira executar o teste de carga incluído
 
 ## Executar localmente
+
+Inicie o Redis em outro terminal:
+
+```bash
+docker run --rm -p 6379:6379 redis:7-alpine
+```
 
 Na raiz do projeto, inicie a aplicação com o Maven Wrapper:
 
@@ -44,6 +51,10 @@ O corpo da resposta será:
 ```text
 Hello World!
 ```
+
+A resposta é armazenada no Redis por 10 minutos. O host e a porta padrão são
+`localhost:6379`; configure `SPRING_DATA_REDIS_HOST` e
+`SPRING_DATA_REDIS_PORT` para usar outro endereço.
 
 Para compilar, empacotar e executar os testes:
 
@@ -66,10 +77,11 @@ Construa a imagem a partir da raiz do projeto:
 docker build -f dockerfile -t hello-word .
 ```
 
-Inicie o container:
+Para executar a aplicação em container junto com o Redis, use o Docker Compose
+descrito abaixo:
 
 ```bash
-docker run --rm -p 8080:8080 hello-word
+docker compose up --build
 ```
 
 Em outro terminal, teste o endpoint:
@@ -83,8 +95,8 @@ A resposta esperada é `Hello World!`. Para parar o container, pressione
 
 ### Executar cinco instâncias com Docker Compose
 
-O arquivo `docker-compose.yml` inicia cinco instâncias da API. Cada uma escuta
-na porta `8080` dentro do container e fica disponível no host pelas portas
+O arquivo `docker-compose.yml` inicia o Redis e cinco instâncias da API. Cada
+instância escuta na porta `8080` dentro do container e fica disponível no host pelas portas
 `8080` a `8084`:
 
 ```bash
@@ -119,6 +131,14 @@ Para parar e remover os containers:
 ```bash
 docker compose down
 ```
+
+## Cache Redis
+
+Todas as instâncias usam o mesmo serviço Redis do Compose, permitindo que
+compartilhem a resposta em cache. A entrada `greetings` expira após 10 minutos.
+Para execução fora do Compose, o padrão é conectar a `localhost:6379`; as
+variáveis `SPRING_DATA_REDIS_HOST` e `SPRING_DATA_REDIS_PORT` podem substituir
+essa configuração.
 
 ## Proxy reverso com Nginx
 

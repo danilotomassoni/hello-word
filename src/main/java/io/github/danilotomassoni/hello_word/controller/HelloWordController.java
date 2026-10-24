@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.github.danilotomassoni.hello_word.service.GreetingService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -19,10 +20,16 @@ public class HelloWordController {
     @Value("${server.port}")
     private String serverPort;
 
+    private final GreetingService greetingService;
+
+    public HelloWordController(GreetingService greetingService) {
+        this.greetingService = greetingService;
+    }
+
     @GetMapping
     public ResponseEntity<String> helloWorld(HttpServletRequest request) {
         String clientIp = request.getRemoteAddr();
         log.warn("--> Requisição RECEBIDA na instância da porta {} | IP do Cliente: {}", serverPort, clientIp);
-        return ResponseEntity.ok("Hello World!");
+        return ResponseEntity.ok(greetingService.getGreeting());
     }
 }
